@@ -1,4 +1,4 @@
-// firebase.js — 9jaCash
+// firebase.js — 9jaCash bih
 // Initialize Firebase and export _9jaCash global for all pages
 
 const firebaseConfig = {
