@@ -939,10 +939,10 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           const now = Date.now();
-          // Changed from 24 hours to 2 minutes (2 * 60 seconds * 1000ms)
-          const twoMinutes = 2 * 60 * 1000; 
+          // Changed from 24 hours to 24 hours (2 * 60 seconds * 1000ms)
+          const twentyFourHours = 24 * 60 * 60 * 1000; 
           
-          // Filter out tasks older than 2 minutes
+          // Filter out tasks older than 24 hours
           completedTasksMap = {};
           for (const [taskId, timestamp] of Object.entries(parsed)) {
             if (now - timestamp < twoMinutes) {
@@ -963,10 +963,10 @@
     function isTaskCompleted(taskId) {
       if (!completedTasksMap[taskId]) return false;
       const now = Date.now();
-      const twoMinutes = 2 * 60 * 1000;
+      const twentyFourHours = 24 * 60 * 60 * 1000;
       
       if (now - completedTasksMap[taskId] >= twoMinutes) {
-        // Expired after 2 minutes, clear it so task resets
+        // Expired after 24 hours, clear it so task resets
         delete completedTasksMap[taskId];
         saveCompletedTasks();
         return false;
@@ -1215,7 +1215,7 @@
       }
 
       if (isTaskCompleted(id)) {
-        showToast('Already claimed within the last 2 minutes!', 'error');
+        showToast('Already claimed within the last 24 hours!', 'error');
         return;
       }
 
