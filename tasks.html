@@ -930,6 +930,48 @@
       return null;
     }
 
+    // ========== COMPLETED TASKS MAP & TIMESTAMP LOGIC ==========
+    let completedTasksMap = {}; // Format: { taskId: timestamp }
+
+    function loadCompletedTasks() {
+      try {
+        const saved = localStorage.getItem('completedTasksData');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const now = Date.now();
+          const twentyFourHours = 24 * 60 * 60 * 1000;
+          
+          // Filter out tasks older than 24 hours
+          completedTasksMap = {};
+          for (const [taskId, timestamp] of Object.entries(parsed)) {
+            if (now - timestamp < twentyFourHours) {
+              completedTasksMap[taskId] = timestamp;
+            }
+          }
+          saveCompletedTasks();
+        }
+      } catch (e) {
+        completedTasksMap = {};
+      }
+    }
+
+    function saveCompletedTasks() {
+      localStorage.setItem('completedTasksData', JSON.stringify(completedTasksMap));
+    }
+
+    function isTaskCompleted(taskId) {
+      if (!completedTasksMap[taskId]) return false;
+      const now = Date.now();
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+      if (now - completedTasksMap[taskId] >= twentyFourHours) {
+        // Expired after 24 hours, clear it so task resets
+        delete completedTasksMap[taskId];
+        saveCompletedTasks();
+        return false;
+      }
+      return true;
+    }
+
     // ========== REALTIME FIREBASE LISTENERS ==========
     function initRealtimeListeners() {
       const db = getDb();
@@ -939,9 +981,7 @@
         return;
       }
 
-      const today = new Date().toDateString();
-      const saved = localStorage.getItem('completedTasks_' + today);
-      completedTaskIds = saved ? JSON.parse(saved) : [];
+      loadCompletedTasks();
 
       // 1. Realtime listener for tasks from Firestore ('settings/tasks' doc or 'tasks' collection)
       db.collection('settings').doc('tasks').onSnapshot((doc) => {
@@ -981,8 +1021,14 @@
             userData = Object.assign({}, userData, freshData);
             
             if (freshData.completedTasks && Array.isArray(freshData.completedTasks)) {
-              completedTaskIds = Array.from(new Set([...completedTaskIds, ...freshData.completedTasks]));
-              localStorage.setItem('completedTasks_' + today, JSON.stringify(completedTaskIds));
+              // Sync backend completed task IDs as fallback with current timestamp if not present
+              const now = Date.now();
+              freshData.completedTasks.forEach(id => {
+                if (!completedTasksMap[id]) {
+                  completedTasksMap[id] = now;
+                }
+              });
+              saveCompletedTasks();
             }
             
             if (freshData.balance !== undefined) {
@@ -1044,7 +1090,7 @@
       } else if (currentFilter === 'social') {
         filtered = filtered.filter(t => ['tiktok', 'facebook', 'instagram', 'twitter', 'youtube', 'social'].includes(t.cat || t.category));
       } else if (currentFilter === 'completed') {
-        filtered = filtered.filter(t => completedTaskIds.includes(t.id));
+        filtered = filtered.filter(t => isTaskCompleted(t.id));
       }
 
       if (filtered.length === 0) {
@@ -1059,7 +1105,7 @@
       }
 
       filtered.forEach((task) => {
-        const isCompleted = completedTaskIds.includes(task.id);
+        const isCompleted = isTaskCompleted(task.id);
         const catName = task.cat || task.category || 'other';
         const iconClass = CAT_ICONS[catName] || CAT_ICONS.other;
         const imgClass = CAT_CLASSES[catName] || 'other';
@@ -1167,14 +1213,14 @@
         return;
       }
 
-      if (completedTaskIds.includes(id)) {
-        showToast('Already claimed!', 'error');
+      if (isTaskCompleted(id)) {
+        showToast('Already claimed within the last 24 hours!', 'error');
         return;
       }
 
-      completedTaskIds.push(id);
-      const today = new Date().toDateString();
-      localStorage.setItem('completedTasks_' + today, JSON.stringify(completedTaskIds));
+      // Record completion timestamp
+      completedTasksMap[id] = Date.now();
+      saveCompletedTasks();
 
       let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
       balance += amount;
@@ -1183,7 +1229,7 @@
       if (userData) {
         userData.balance = balance;
         userData.totalMined = (userData.totalMined || 0) + amount;
-        userData.completedTasks = completedTaskIds;
+        userData.completedTasks = Object.keys(completedTasksMap);
         localStorage.setItem("9jaCashUser", JSON.stringify(userData));
 
         // Real-Time Save to Firestore Database
@@ -1192,7 +1238,7 @@
           db.collection("users").doc(userData.phone).set({
             balance: balance,
             totalMined: userData.totalMined,
-            completedTasks: firebase.firestore.FieldValue.arrayUnion(id),
+            completedTasks: Object.keys(completedTasksMap),
             lastTaskClaimed: id,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           }, { merge: true }).catch((err) => console.error("Firebase Sync Error:", err));
@@ -1258,9 +1304,10 @@
 
     // ========== UPDATE STATS ==========
     function updateStats() {
-      const completed = completedTaskIds.length;
+      const activeCompletedIds = Object.keys(completedTasksMap).filter(id => isTaskCompleted(id));
+      const completed = activeCompletedIds.length;
       const total = allTasks.length;
-      const earned = allTasks.filter(t => completedTaskIds.includes(t.id)).reduce((sum, t) => sum + Number(t.amt || t.amount || 0), 0);
+      const earned = allTasks.filter(t => activeCompletedIds.includes(t.id)).reduce((sum, t) => sum + Number(t.amt || t.amount || 0), 0);
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
       document.getElementById('totalEarned').textContent = '₦' + earned.toLocaleString();
@@ -1299,10 +1346,13 @@
 
     // ========== INIT ==========
     window.addEventListener("DOMContentLoaded", function () {
+      loadCompletedTasks();
       initDarkMode();
       initRealtimeListeners();
       initLiveWithdrawalPopups();
     });
+
+    
   </script>
 
   <!-- Live Withdrawal Popup Container -->
