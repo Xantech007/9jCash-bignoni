@@ -819,7 +819,7 @@
     <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i>Profile</button>
   </div>
 
-  <script>
+<script>
     // ========== DARK MODE ==========
     function initDarkMode() {
       const isDark = localStorage.getItem("9jaCashDark") !== "false";
@@ -1023,11 +1023,10 @@
             userData = Object.assign({}, userData, freshData);
             
             if (freshData.completedTasks && Array.isArray(freshData.completedTasks)) {
-              // Sync backend completed task IDs as fallback with current timestamp if not present
-              const now = Date.now();
+              // Only add if not already tracked locally, preserving original claim timestamps
               freshData.completedTasks.forEach(id => {
                 if (!completedTasksMap[id]) {
-                  completedTasksMap[id] = now;
+                  completedTasksMap[id] = Date.now();
                 }
               });
               saveCompletedTasks();
@@ -1216,7 +1215,7 @@
       }
 
       if (isTaskCompleted(id)) {
-        showToast('Already claimed within the last 24 hours!', 'error');
+        showToast('Already claimed within the last 2 minutes!', 'error');
         return;
       }
 
@@ -1352,9 +1351,13 @@
       initDarkMode();
       initRealtimeListeners();
       initLiveWithdrawalPopups();
-    });
 
-    
+      // Background ticker to automatically refresh UI elements and re-enable buttons after expiration
+      setInterval(() => {
+        renderTasks();
+        updateStats();
+      }, 5000);
+    });
   </script>
 
   <!-- Live Withdrawal Popup Container -->
