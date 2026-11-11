@@ -932,19 +932,20 @@
 
     // ========== COMPLETED TASKS MAP & TIMESTAMP LOGIC ==========
     let completedTasksMap = {}; // Format: { taskId: timestamp }
-
+    
     function loadCompletedTasks() {
       try {
         const saved = localStorage.getItem('completedTasksData');
         if (saved) {
           const parsed = JSON.parse(saved);
           const now = Date.now();
-          const twentyFourHours = 24 * 60 * 60 * 1000;
+          // Changed from 24 hours to 2 minutes (2 * 60 seconds * 1000ms)
+          const twoMinutes = 2 * 60 * 1000; 
           
-          // Filter out tasks older than 24 hours
+          // Filter out tasks older than 2 minutes
           completedTasksMap = {};
           for (const [taskId, timestamp] of Object.entries(parsed)) {
-            if (now - timestamp < twentyFourHours) {
+            if (now - timestamp < twoMinutes) {
               completedTasksMap[taskId] = timestamp;
             }
           }
@@ -954,17 +955,18 @@
         completedTasksMap = {};
       }
     }
-
+    
     function saveCompletedTasks() {
       localStorage.setItem('completedTasksData', JSON.stringify(completedTasksMap));
     }
-
+    
     function isTaskCompleted(taskId) {
       if (!completedTasksMap[taskId]) return false;
       const now = Date.now();
-      const twentyFourHours = 24 * 60 * 60 * 1000;
-      if (now - completedTasksMap[taskId] >= twentyFourHours) {
-        // Expired after 24 hours, clear it so task resets
+      const twoMinutes = 2 * 60 * 1000;
+      
+      if (now - completedTasksMap[taskId] >= twoMinutes) {
+        // Expired after 2 minutes, clear it so task resets
         delete completedTasksMap[taskId];
         saveCompletedTasks();
         return false;
