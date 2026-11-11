@@ -819,7 +819,7 @@
     <button class="nav-item" onclick="window.location.href='profile.html'"><i class="fa-solid fa-user"></i>Profile</button>
   </div>
 
-<script>
+  <script>
     // ========== DARK MODE ==========
     function initDarkMode() {
       const isDark = localStorage.getItem("9jaCashDark") !== "false";
@@ -939,13 +939,13 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           const now = Date.now();
-          // Changed from 24 hours to 24 hours (2 * 60 seconds * 1000ms)
+          // 24 hours in milliseconds (24 * 60 * 60 * 1000)
           const twentyFourHours = 24 * 60 * 60 * 1000; 
           
           // Filter out tasks older than 24 hours
           completedTasksMap = {};
           for (const [taskId, timestamp] of Object.entries(parsed)) {
-            if (now - timestamp < twoMinutes) {
+            if (now - timestamp < twentyFourHours) {
               completedTasksMap[taskId] = timestamp;
             }
           }
@@ -965,7 +965,7 @@
       const now = Date.now();
       const twentyFourHours = 24 * 60 * 60 * 1000;
       
-      if (now - completedTasksMap[taskId] >= twoMinutes) {
+      if (now - completedTasksMap[taskId] >= twentyFourHours) {
         // Expired after 24 hours, clear it so task resets
         delete completedTasksMap[taskId];
         saveCompletedTasks();
@@ -1359,7 +1359,7 @@
       }, 5000);
     });
   </script>
-
+  
   <!-- Live Withdrawal Popup Container -->
   <div id="liveWithdrawalPopup"
     style="position: fixed; top: 20px; left: 50%; transform: translate(-50%, -150px); z-index: 10000; display: flex; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(99, 102, 241, 0.4); border-radius: 16px; padding: 12px 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; max-width: 90%; width: 280px; opacity: 0;">
