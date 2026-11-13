@@ -12,735 +12,217 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
   <script src="firebase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: #fff;
-      color: #1a1a2e;
-      min-height: 100vh;
-    }
+    body { font-family: 'Outfit', sans-serif; background: #fff; color: #1a1a2e; min-height: 100vh; }
 
     /* Dark mode - matches dashboard */
-    body.dark-mode {
-      background: #0f172a;
-      color: #f8fafc;
-    }
-
-    body.dark-mode .top-gradient {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
-    }
-
-    body.dark-mode .task-item {
-      background: #1e293b;
-      border-color: #334155;
-    }
-
-    body.dark-mode .task-name {
-      color: #f8fafc;
-    }
-
-    body.dark-mode .task-desc {
-      color: #94a3b8;
-    }
-
-    body.dark-mode .task-link-btn {
-      background: #334155;
-      border-color: #334155;
-      color: #94a3b8;
-    }
-
-    body.dark-mode .tabs .tab {
-      background: #1e293b;
-      border-color: #334155;
-      color: #94a3b8;
-    }
-
-    body.dark-mode .tabs .tab.active {
-      background: #6366f1;
-      color: #fff;
-      border-color: #6366f1;
-    }
-
-    body.dark-mode .bottom-nav {
-      background: #1e293b;
-      border-color: #334155;
-    }
-
-    body.dark-mode .nav-item {
-      color: #64748b;
-    }
-
-    body.dark-mode .nav-item.active {
-      color: #818cf8;
-    }
-
-    body.dark-mode .nav-mid {
-      border-color: #0f172a;
-    }
-
-    body.dark-mode .empty-box .empty-title {
-      color: #f8fafc;
-    }
-
-    body.dark-mode .empty-box .empty-text {
-      color: #94a3b8;
-    }
-
-    body.dark-mode .security-block {
-      background: #0f172a;
-    }
-
-    body.dark-mode .security-title {
-      color: #f8fafc;
-    }
-
-    body.dark-mode .security-text {
-      color: #94a3b8;
-    }
-
-    body.dark-mode .earn-pill {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    body.dark-mode .earn-value {
-      color: #fff;
-    }
+    body.dark-mode { background: #0f172a; color: #f8fafc; }
+    body.dark-mode .top-gradient { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%); }
+    body.dark-mode .task-item { background: #1e293b; border-color: #334155; }
+    body.dark-mode .task-name { color: #f8fafc; }
+    body.dark-mode .task-desc { color: #94a3b8; }
+    body.dark-mode .task-link-btn { background: #334155; border-color: #334155; color: #94a3b8; }
+    body.dark-mode .tabs .tab { background: #1e293b; border-color: #334155; color: #94a3b8; }
+    body.dark-mode .tabs .tab.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+    body.dark-mode .bottom-nav { background: #1e293b; border-color: #334155; }
+    body.dark-mode .nav-item { color: #64748b; }
+    body.dark-mode .nav-item.active { color: #818cf8; }
+    body.dark-mode .nav-mid { border-color: #0f172a; }
+    body.dark-mode .empty-box .empty-title { color: #f8fafc; }
+    body.dark-mode .empty-box .empty-text { color: #94a3b8; }
+    body.dark-mode .security-block { background: #0f172a; }
+    body.dark-mode .security-title { color: #f8fafc; }
+    body.dark-mode .security-text { color: #94a3b8; }
+    body.dark-mode .earn-pill { background: rgba(255, 255, 255, 0.1); }
+    body.dark-mode .earn-value { color: #fff; }
 
     /* Warm gradient top */
     .top-gradient {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 280px;
+      position: fixed; top: 0; left: 0; right: 0; height: 280px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      border-radius: 0 0 40px 40px;
-      z-index: 0;
+      border-radius: 0 0 40px 40px; z-index: 0;
     }
 
     /* Main */
-    .app {
-      position: relative;
-      z-index: 1;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 20px 100px;
-    }
+    .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 20px 100px; }
 
     /* Header */
-    .header {
-      padding: 24px 0 16px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
+    .header { padding: 24px 0 16px; display: flex; align-items: center; gap: 16px; }
     .back-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      transition: all 0.3s;
+      width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; cursor: pointer; border: none; transition: all 0.3s;
     }
-
-    .back-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    .header-text {
-      color: #fff;
-    }
-
-    .header-title {
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .header-sub {
-      font-size: 13px;
-      opacity: 0.8;
-      margin-top: 2px;
-    }
+    .back-btn:hover { background: rgba(255, 255, 255, 0.3); }
+    .header-text { color: #fff; }
+    .header-title { font-size: 24px; font-weight: 800; }
+    .header-sub { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
     /* Earnings pill */
     .earn-pill {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      color: #fff;
+      background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-radius: 16px;
+      padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; color: #fff;
     }
-
     .earn-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #667eea;
-      font-size: 20px;
+      width: 48px; height: 48px; border-radius: 14px; background: #fff; display: flex;
+      align-items: center; justify-content: center; color: #667eea; font-size: 20px;
     }
-
-    .earn-info {
-      flex: 1;
-    }
-
-    .earn-label {
-      font-size: 11px;
-      opacity: 0.7;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .earn-value {
-      font-size: 24px;
-      font-weight: 800;
-      margin-top: 2px;
-    }
+    .earn-info { flex: 1; }
+    .earn-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+    .earn-value { font-size: 24px; font-weight: 800; margin-top: 2px; }
 
     /* Progress ring */
-    .progress-ring {
-      width: 56px;
-      height: 56px;
-      position: relative;
-    }
-
-    .progress-ring svg {
-      transform: rotate(-90deg);
-    }
-
-    .progress-ring circle {
-      fill: none;
-      stroke-width: 4;
-    }
-
-    .progress-ring .bg {
-      stroke: rgba(255, 255, 255, 0.2);
-    }
-
-    .progress-ring .fill {
-      stroke: #fff;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 0.6s ease;
-    }
-
+    .progress-ring { width: 56px; height: 56px; position: relative; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring circle { fill: none; stroke-width: 4; }
+    .progress-ring .bg { stroke: rgba(255, 255, 255, 0.2); }
+    .progress-ring .fill { stroke: #fff; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
     .progress-text {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
     }
 
     /* Task tabs */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-
-    .tabs::-webkit-scrollbar {
-      display: none;
-    }
-
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
     .tab {
-      flex-shrink: 0;
-      padding: 10px 20px;
-      border-radius: 100px;
-      border: 1px solid #e2e8f0;
-      background: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.3s;
+      flex-shrink: 0; padding: 10px 20px; border-radius: 100px; border: 1px solid #e2e8f0;
+      background: #fff; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.3s;
     }
+    .tab.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .tab:hover:not(.active) { background: #f8fafc; }
 
-    .tab.active {
-      background: #1a1a2e;
-      color: #fff;
-      border-color: #1a1a2e;
-    }
-
-    .tab:hover:not(.active) {
-      background: #f8fafc;
-    }
-
-    /* Task cards — vertical stack */
-    .task-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
+    /* Task cards - vertical stack */
+    .task-list { display: flex; flex-direction: column; gap: 14px; }
     .task-item {
-      background: #fff;
-      border-radius: 20px;
-      padding: 0;
-      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-      border: 1px solid #f1f5f9;
-      overflow: hidden;
-      transition: all 0.3s;
+      background: #fff; border-radius: 20px; padding: 0; box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+      border: 1px solid #f1f5f9; overflow: hidden; transition: all 0.3s;
     }
-
-    .task-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .task-item.completed {
-      opacity: 0.6;
-    }
-
-    .task-item.completed .task-status-bar {
-      background: #10b981;
-    }
-
-    .task-status-bar {
-      height: 4px;
-      background: linear-gradient(90deg, #667eea, #764ba2);
-    }
-
-    .task-body {
-      padding: 18px 20px;
-    }
-
-    .task-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
+    .task-item:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); }
+    .task-item.completed { opacity: 0.6; }
+    .task-item.completed .task-status-bar { background: #10b981; }
+    .task-status-bar { height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); }
+    .task-body { padding: 18px 20px; }
+    .task-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
     .task-img {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 24px;
-      flex-shrink: 0;
+      width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px; flex-shrink: 0;
     }
-
-    .task-img.tiktok {
-      background: #000;
-    }
-
-    .task-img.facebook {
-      background: #1877f2;
-    }
-
-    .task-img.youtube {
-      background: #ff0000;
-    }
-
-    .task-img.instagram {
-      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-    }
-
-    .task-main {
-      flex: 1;
-    }
-
-    .task-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 4px;
-      line-height: 1.3;
-    }
-
+    .task-img.tiktok { background: #000; }
+    .task-img.facebook { background: #1877f2; }
+    .task-img.youtube { background: #ff0000; }
+    .task-img.instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .task-main { flex: 1; }
+    .task-name { font-size: 16px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.3; }
     .task-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: #f3e8ff;
-      color: #8b5cf6;
-      margin-bottom: 8px;
+      display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px; background: #f3e8ff; color: #8b5cf6; margin-bottom: 8px;
     }
-
-    .task-tag.hot {
-      background: #fef3c7;
-      color: #d97706;
-    }
-
-    .task-tag i {
-      font-size: 9px;
-    }
-
-    .task-reward {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 18px;
-      font-weight: 800;
-      color: #667eea;
-    }
-
-    .task-reward i {
-      font-size: 14px;
-    }
-
-    .task-desc {
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
-
+    .task-tag.hot { background: #fef3c7; color: #d97706; }
+    .task-tag i { font-size: 9px; }
+    .task-reward { display: flex; align-items: center; gap: 6px; font-size: 18px; font-weight: 800; color: #667eea; }
+    .task-reward i { font-size: 14px; }
+    .task-desc { font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 14px; }
     .task-link-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      margin-bottom: 14px;
-      transition: all 0.3s;
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 12px;
+      background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; font-size: 13px; font-weight: 600;
+      text-decoration: none; margin-bottom: 14px; transition: all 0.3s;
     }
-
-    .task-link-btn:hover {
-      background: #eef2ff;
-      border-color: #667eea;
-      color: #667eea;
-    }
-
-    .task-link-btn i {
-      color: #667eea;
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 10px;
-    }
-
+    .task-link-btn:hover { background: #eef2ff; border-color: #667eea; color: #667eea; }
+    .task-link-btn i { color: #667eea; }
+    .task-actions { display: flex; gap: 10px; }
     .btn-start {
-      flex: 1;
-      padding: 14px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      flex: 1; padding: 14px; border-radius: 14px; background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-
-    .btn-start:active {
-      transform: scale(0.97);
-    }
-
-    .btn-start.completed {
-      background: #10b981;
-    }
-
+    .btn-start:active { transform: scale(0.97); }
+    .btn-start.completed { background: #10b981; }
     .btn-skip {
-      padding: 14px;
-      border-radius: 14px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      color: #94a3b8;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s;
+      padding: 14px; border-radius: 14px; background: #f8fafc; color: #94a3b8; font-size: 14px;
+      font-weight: 700; border: none; cursor: pointer; transition: all 0.3s;
     }
-
-    .btn-skip:hover {
-      background: #f1f5f9;
-    }
+    .btn-skip:hover { background: #f1f5f9; }
 
     /* Empty state */
-    .empty-box {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
+    .empty-box { text-align: center; padding: 60px 20px; }
     .empty-illustration {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 48px;
-      color: #fff;
-      box-shadow: 0 8px 32px rgba(240, 147, 251, 0.3);
+      width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #f093fb, #f5576c);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;
+      font-size: 48px; color: #fff; box-shadow: 0 8px 32px rgba(240, 147, 251, 0.3);
     }
-
-    .empty-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 8px;
-    }
-
-    .empty-text {
-      font-size: 14px;
-      color: #64748b;
-      max-width: 260px;
-      margin: 0 auto;
-    }
+    .empty-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+    .empty-text { font-size: 14px; color: #64748b; max-width: 260px; margin: 0 auto; }
 
     /* Bottom nav */
     .bottom-nav {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
-      height: 64px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 10000;
-      max-width: 448px;
-      margin: 0 auto;
-      padding: 0 6px;
-      border-radius: 40px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-      transition: all 0.3s ease;
+      position: fixed; bottom: 16px; left: 16px; right: 16px; height: 64px; background: #ffffff;
+      border: 1px solid #e2e8f0; display: flex; justify-content: space-around; align-items: center;
+      z-index: 10000; max-width: 448px; margin: 0 auto; padding: 0 6px; border-radius: 40px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); transition: all 0.3s ease;
     }
-
-    body.dark-mode .bottom-nav {
-      background: #1e293b;
-      border-color: #334155;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-    }
-
+    body.dark-mode .bottom-nav { background: #1e293b; border-color: #334155; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); }
     .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      color: #64748b;
-      text-decoration: none;
-      font-size: 10px;
-      font-weight: 700;
-      transition: all 0.2s ease;
-      border: none;
-      background: none;
-      cursor: pointer;
-      height: 48px;
-      min-width: 58px;
-      border-radius: 24px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      color: #64748b; text-decoration: none; font-size: 10px; font-weight: 700; transition: all 0.2s ease;
+      border: none; background: none; cursor: pointer; height: 48px; min-width: 58px; border-radius: 24px;
     }
-
-    .nav-item i {
-      font-size: 18px;
-      transition: transform 0.2s ease;
-    }
-
-    .nav-item.active {
-      color: #6366f1;
-      background: rgba(99, 102, 241, 0.08);
-    }
-
-    body.dark-mode .nav-item.active {
-      color: #818cf8;
-      background: rgba(129, 140, 248, 0.08);
-    }
-
+    .nav-item i { font-size: 18px; transition: transform 0.2s ease; }
+    .nav-item.active { color: #6366f1; background: rgba(99, 102, 241, 0.08); }
+    body.dark-mode .nav-item.active { color: #818cf8; background: rgba(129, 140, 248, 0.08); }
     .nav-mid {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 15px rgba(99,102,241,0.3);
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.3); border: none; cursor: pointer; transition: all 0.2s ease;
     }
-
-    .nav-mid:active {
-      transform: scale(0.92);
-    }
+    .nav-mid:active { transform: scale(0.92); }
 
     /* Toast */
     .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-80px);
-      background: #1a1a2e;
-      color: #fff;
-      padding: 14px 24px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      z-index: 200;
-      transition: all 0.4s;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      background: #1a1a2e; color: #fff; padding: 14px 24px; border-radius: 16px; display: flex;
+      align-items: center; gap: 10px; font-size: 14px; font-weight: 600; z-index: 200;
+      transition: all 0.4s; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .toast i {
-      color: #10b981;
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast i { color: #10b981; }
 
     /* Security */
     .security-block {
-      position: fixed;
-      inset: 0;
-      background: #fff;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      text-align: center;
-      padding: 20px;
+      position: fixed; inset: 0; background: #fff; display: none; align-items: center;
+      justify-content: center; z-index: 9999; flex-direction: column; text-align: center; padding: 20px;
     }
-
-    .security-block.active {
-      display: flex;
-    }
-
+    .security-block.active { display: flex; }
     .security-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 28px;
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 36px;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 40px rgba(239, 68, 68, 0.2);
+      width: 80px; height: 80px; border-radius: 28px; background: linear-gradient(135deg, #ef4444, #dc2626);
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 36px;
+      margin-bottom: 24px; box-shadow: 0 12px 40px rgba(239, 68, 68, 0.2);
     }
-
-    .security-title {
-      font-size: 24px;
-      font-weight: 800;
-      color: #1a1a2e;
-      margin-bottom: 8px;
-    }
-
-    .security-text {
-      font-size: 14px;
-      color: #64748b;
-      max-width: 300px;
-      line-height: 1.6;
-    }
+    .security-title { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+    .security-text { font-size: 14px; color: #64748b; max-width: 300px; line-height: 1.6; }
 
     .theme-toggle-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      transition: all 0.3s;
-      margin-left: auto;
+      width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; cursor: pointer; border: none; transition: all 0.3s; margin-left: auto;
     }
+    .theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.35); }
 
-    .theme-toggle-btn:hover {
-      background: rgba(255, 255, 255, 0.35);
-    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .anim {
-      animation: slideUp 0.6s ease both;
-    }
-
-    .d1 {
-      animation-delay: 0.1s;
-    }
-
-    .d2 {
-      animation-delay: 0.2s;
-    }
-
-    .d3 {
-      animation-delay: 0.3s;
-    }
+    .anim { animation: slideUp 0.6s ease both; }
+    .d1 { animation-delay: 0.1s; }
+    .d2 { animation-delay: 0.2s; }
+    .d3 { animation-delay: 0.3s; }
   </style>
 </head>
 
@@ -838,25 +320,23 @@
       document.getElementById("themeIcon").className = isDark ? "fa-solid fa-moon" : "fa-solid fa-sun";
     }
 
-    // ========== SECURITY ==========
+    // ========== SECURITY (client-side rate limit) ==========
     const SecurityGate = {
-      requests: new Map(),
+      requests: new Map(), // key -> array of timestamps
       maxRequests: 40,
       windowMs: 60000,
 
       checkLimit(key) {
         const now = Date.now();
-        const windowStart = now - this.windowMs;
-        for (const [k, v] of this.requests) {
-          if (v < windowStart) this.requests.delete(k);
-        }
-        const count = this.requests.get(key) || 0;
-        if (count >= this.maxRequests) {
+        const recent = (this.requests.get(key) || []).filter(t => now - t < this.windowMs);
+        if (recent.length >= this.maxRequests) {
+          this.requests.set(key, recent);
           document.getElementById('securityBlock').classList.add('active');
           setTimeout(() => document.getElementById('securityBlock').classList.remove('active'), 30000);
           return false;
         }
-        this.requests.set(key, count + 1);
+        recent.push(now);
+        this.requests.set(key, recent);
         return true;
       }
     };
@@ -872,7 +352,7 @@
     }
 
     const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:3000' : '';
-    
+
     if (userData && userData.phone) {
       fetch(API_BASE_URL + '/api/user/sync', {
         method: 'POST',
@@ -895,7 +375,6 @@
 
     // ========== TASK STATE ==========
     let allTasks = [];
-    let completedTaskIds = [];
     let currentFilter = 'all';
 
     const CAT_ICONS = {
@@ -918,60 +397,32 @@
 
     // Safely retrieve Firestore DB instance from firebase.js (_9jaCash.db)
     function getDb() {
-      if (window._9jaCash && window._9jaCash.db) {
-        return window._9jaCash.db;
-      }
-      if (window.db) {
-        return window.db;
-      }
-      if (typeof firebase !== 'undefined' && firebase.firestore) {
-        return firebase.firestore();
-      }
+      if (window._9jaCash && window._9jaCash.db) return window._9jaCash.db;
+      if (window.db) return window.db;
+      if (typeof firebase !== 'undefined' && firebase.firestore) return firebase.firestore();
       return null;
     }
 
-    // ========== COMPLETED TASKS MAP & TIMESTAMP LOGIC ==========
-    let completedTasksMap = {}; // Format: { taskId: timestamp }
-    
-    function loadCompletedTasks() {
-      try {
-        const saved = localStorage.getItem('completedTasksData');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          const now = Date.now();
-          // Changed from 24 hours to 2 minutes (2 * 60 seconds * 1000ms)
-          const twoMinutes = 2 * 60 * 1000; 
-          
-          // Filter out tasks older than 2 minutes
-          completedTasksMap = {};
-          for (const [taskId, timestamp] of Object.entries(parsed)) {
-            if (now - timestamp < twoMinutes) {
-              completedTasksMap[taskId] = timestamp;
-            }
-          }
-          saveCompletedTasks();
-        }
-      } catch (e) {
-        completedTasksMap = {};
-      }
+    // ========== RESET TIME + CLAIM TIMESTAMPS (from Firestore) ==========
+    // settings/tasks.resetTime = number of MINUTES (change the multiplier below for seconds/hours)
+    let resetTimeMs = 2 * 60 * 1000;   // fallback until Firestore loads
+    let completedTasksMap = {};        // { taskId: claimedAtMillis } - mirrored from users/{phone}.taskClaims
+
+    function resetLabel() {
+      const mins = resetTimeMs / 60000;
+      return mins === 1 ? '1 minute' : mins + ' minutes';
     }
-    
-    function saveCompletedTasks() {
-      localStorage.setItem('completedTasksData', JSON.stringify(completedTasksMap));
+
+    function toMillis(v) {
+      if (!v) return 0;
+      if (typeof v.toMillis === 'function') return v.toMillis();
+      return Number(v) || 0;
     }
-    
+
     function isTaskCompleted(taskId) {
-      if (!completedTasksMap[taskId]) return false;
-      const now = Date.now();
-      const twoMinutes = 2 * 60 * 1000;
-      
-      if (now - completedTasksMap[taskId] >= twoMinutes) {
-        // Expired after 2 minutes, clear it so task resets
-        delete completedTasksMap[taskId];
-        saveCompletedTasks();
-        return false;
-      }
-      return true;
+      const claimedAt = completedTasksMap[taskId];
+      if (!claimedAt) return false;
+      return Date.now() - claimedAt < resetTimeMs;
     }
 
     // ========== REALTIME FIREBASE LISTENERS ==========
@@ -983,10 +434,13 @@
         return;
       }
 
-      loadCompletedTasks();
-
-      // 1. Realtime listener for tasks from Firestore ('settings/tasks' doc or 'tasks' collection)
+      // 1. settings/tasks -> tasks list + resetTime
       db.collection('settings').doc('tasks').onSnapshot((doc) => {
+        if (doc.exists) {
+          const mins = Number(doc.data().resetTime);
+          if (mins > 0) resetTimeMs = mins * 60 * 1000;
+        }
+
         if (doc.exists && doc.data().tasks) {
           allTasks = doc.data().tasks || [];
           if (allTasks.length === 0) {
@@ -1015,31 +469,27 @@
         showErrorState();
       });
 
-      // 2. Realtime listener for User document updates from Firestore
+      // 2. users/{phone} -> balance + claim timestamps
       if (userData && userData.phone) {
         db.collection('users').doc(userData.phone).onSnapshot((userDoc) => {
-          if (userDoc.exists) {
-            const freshData = userDoc.data();
-            userData = Object.assign({}, userData, freshData);
-            
-            if (freshData.completedTasks && Array.isArray(freshData.completedTasks)) {
-              // Only add if not already tracked locally, preserving original claim timestamps
-              freshData.completedTasks.forEach(id => {
-                if (!completedTasksMap[id]) {
-                  completedTasksMap[id] = Date.now();
-                }
-              });
-              saveCompletedTasks();
-            }
-            
-            if (freshData.balance !== undefined) {
-              localStorage.setItem("walletBalance", freshData.balance.toString());
-            }
+          if (!userDoc.exists) return;
 
-            localStorage.setItem("9jaCashUser", JSON.stringify(userData));
-            renderTasks();
-            updateStats();
+          // 'estimate' avoids null while a serverTimestamp write is still pending
+          const { taskClaims, ...rest } = userDoc.data({ serverTimestamps: 'estimate' });
+
+          completedTasksMap = {};
+          Object.entries(taskClaims || {}).forEach(([id, ts]) => {
+            completedTasksMap[id] = toMillis(ts);
+          });
+
+          userData = Object.assign({}, userData, rest);
+          if (rest.balance !== undefined) {
+            localStorage.setItem("walletBalance", rest.balance.toString());
           }
+          localStorage.setItem("9jaCashUser", JSON.stringify(userData));
+
+          renderTasks();
+          updateStats();
         }, (err) => {
           console.error('Realtime User Listener Error:', err);
         });
@@ -1077,6 +527,7 @@
     // ========== RENDER TASKS ==========
     function renderTasks() {
       const container = document.getElementById('taskList');
+      if (!allTasks.length) return; // keep loading/empty/error state until tasks arrive
       container.innerHTML = '';
 
       let filtered = [...allTasks];
@@ -1215,13 +666,12 @@
       }
 
       if (isTaskCompleted(id)) {
-        showToast('Already claimed within the last 2 minutes!', 'error');
+        showToast('Already claimed. Resets every ' + resetLabel() + '.', 'error');
         return;
       }
 
-      // Record completion timestamp
+      // Optimistic local update (the Firestore snapshot replaces it with the server time)
       completedTasksMap[id] = Date.now();
-      saveCompletedTasks();
 
       let balance = parseFloat(localStorage.getItem("walletBalance")) || 0;
       balance += amount;
@@ -1230,26 +680,24 @@
       if (userData) {
         userData.balance = balance;
         userData.totalMined = (userData.totalMined || 0) + amount;
-        userData.completedTasks = Object.keys(completedTasksMap);
         localStorage.setItem("9jaCashUser", JSON.stringify(userData));
 
-        // Real-Time Save to Firestore Database
+        // Save claim timestamp + balance to Firestore (merge keeps other tasks' timestamps)
         const db = getDb();
         if (db) {
           db.collection("users").doc(userData.phone).set({
             balance: balance,
             totalMined: userData.totalMined,
-            completedTasks: Object.keys(completedTasksMap),
             lastTaskClaimed: id,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            taskClaims: { [id]: firebase.firestore.FieldValue.serverTimestamp() }
           }, { merge: true }).catch((err) => console.error("Firebase Sync Error:", err));
         }
       }
 
       // Sync balance to Backend API
-      const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:3000' : '';
       if (userData) {
-        fetch(API_URL + '/api/user/update-balance', {
+        fetch(API_BASE_URL + '/api/user/update-balance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1306,7 +754,7 @@
     // ========== UPDATE STATS ==========
     function updateStats() {
       const activeCompletedIds = Object.keys(completedTasksMap).filter(id => isTaskCompleted(id));
-      const completed = activeCompletedIds.length;
+      const completed = allTasks.filter(t => activeCompletedIds.includes(t.id)).length;
       const total = allTasks.length;
       const earned = allTasks.filter(t => activeCompletedIds.includes(t.id)).reduce((sum, t) => sum + Number(t.amt || t.amount || 0), 0);
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -1347,12 +795,11 @@
 
     // ========== INIT ==========
     window.addEventListener("DOMContentLoaded", function () {
-      loadCompletedTasks();
       initDarkMode();
       initRealtimeListeners();
       initLiveWithdrawalPopups();
 
-      // Background ticker to automatically refresh UI elements and re-enable buttons after expiration
+      // Ticker: re-checks cooldowns so tasks reappear once resetTime has passed
       setInterval(() => {
         renderTasks();
         updateStats();
